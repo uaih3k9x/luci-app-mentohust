@@ -66,7 +66,7 @@ openwrt/sdk:x86_64-21.02.7
 构建完成后会得到类似：
 
 ```text
-luci-app-mentohust_1.0.3_all.ipk
+luci-app-mentohust_1.0.4_all.ipk
 luci-i18n-mentohust-zh-cn_*.ipk
 ```
 
@@ -96,7 +96,7 @@ Network -> Ruijie -> mentohust
 将构建出的 IPK 上传到路由器后安装：
 
 ```sh
-opkg install --force-reinstall /tmp/luci-app-mentohust_1.0.3_all.ipk
+opkg install --force-reinstall /tmp/luci-app-mentohust_1.0.4_all.ipk
 opkg install --force-reinstall /tmp/luci-i18n-mentohust-zh-cn_*.ipk
 ```
 

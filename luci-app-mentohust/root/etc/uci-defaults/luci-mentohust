@@ -32,6 +32,7 @@ EOF
 			if [ "$name" = "luci-app-mentohust" ] || [ "$pkg_name" = "luci-app-mentohust" ]; then
 				[ "$type" = "package" ] && found_package=1
 				[ "$type" = "package_list" ] && found_list=1
+				uci -q set "appcenter.@${type}[$idx].version=1.0.4"
 				uci -q set "appcenter.@${type}[$idx].has_luci=1"
 				uci -q set "appcenter.@${type}[$idx].open=1"
 				uci -q set "appcenter.@${type}[$idx].luci_module_route=$route"
@@ -44,7 +45,7 @@ EOF
 	[ "$found_package" = "1" ] || {
 		uci -q add appcenter package
 		uci -q set appcenter.@package[-1].name="luci-app-mentohust"
-		uci -q set appcenter.@package[-1].version="1.0.3"
+		uci -q set appcenter.@package[-1].version="1.0.4"
 		uci -q set appcenter.@package[-1].size="3482"
 		uci -q set appcenter.@package[-1].status="1"
 		uci -q set appcenter.@package[-1].has_luci="1"
@@ -59,7 +60,7 @@ EOF
 		uci -q set appcenter.@package_list[-1].pkg_name="luci-app-mentohust"
 		uci -q set appcenter.@package_list[-1].parent="luci-app-mentohust"
 		uci -q set appcenter.@package_list[-1].size="3482"
-		uci -q set appcenter.@package_list[-1].version="1.0.3"
+		uci -q set appcenter.@package_list[-1].version="1.0.4"
 		uci -q set appcenter.@package_list[-1].has_luci="1"
 		uci -q set appcenter.@package_list[-1].type="1"
 		uci -q set appcenter.@package_list[-1].luci_module_route="$route"
@@ -72,6 +73,7 @@ EOF
 rm -rf /tmp/luci-indexcache* /tmp/luci-modulecache/*
 rm -f /tmp/luci-indexpath /tmp/luci-indexpath_back
 
+[ -x /etc/init.d/mentohust ] && /etc/init.d/mentohust enable >/dev/null 2>&1
 [ -x /etc/init.d/rpcd ] && /etc/init.d/rpcd restart >/dev/null 2>&1
 [ -x /etc/init.d/appcenter ] && /etc/init.d/appcenter restart >/dev/null 2>&1
 exit 0
