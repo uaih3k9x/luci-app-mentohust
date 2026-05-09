@@ -2,7 +2,7 @@
 
 [MentoHUST](https://code.google.com/archive/p/mentohust/) 是一个支持锐捷认证的客户端程序，常用于校园网认证场景。本仓库包含 `mentohust` OpenWrt 客户端和对应的 LuCI 管理界面。
 
-这个 fork 主要修复旧版 OpenWrt / nradio AppCenter 环境中 `luci-app-mentohust` 打开后空白、无法渲染的问题。
+这个 fork 主要修复旧版 OpenWrt / nradio AppCenter 环境中 `luci-app-mentohust` 打开后空白、无法渲染的问题，并补齐客户端校验数据文件的 LuCI 配置入口。
 
 ## 修复内容
 
@@ -22,6 +22,8 @@
   ```
 
 - 安装后自动清理 LuCI 缓存，并重启 `rpcd` 和 `appcenter`，避免升级后仍然打开旧缓存。
+- 增加客户端数据文件/目录配置项，会在启动 `mentohust` 时传递 `-f`，用于锐捷 V2 客户端校验。
+- 修复 DHCP 脚本默认写成 `udhcpc -i` 时缺少接口参数的问题，启动脚本会自动追加当前选择的网卡。
 - 增加 Docker SDK 构建脚本，方便只重打 LuCI IPK。
 
 ## 适用场景
@@ -66,7 +68,7 @@ openwrt/sdk:x86_64-21.02.7
 构建完成后会得到类似：
 
 ```text
-luci-app-mentohust_1.0.4_all.ipk
+luci-app-mentohust_1.0.6_all.ipk
 luci-i18n-mentohust-zh-cn_*.ipk
 ```
 
@@ -96,11 +98,34 @@ Network -> Ruijie -> mentohust
 将构建出的 IPK 上传到路由器后安装：
 
 ```sh
-opkg install --force-reinstall /tmp/luci-app-mentohust_1.0.4_all.ipk
+opkg install --force-reinstall /tmp/luci-app-mentohust_1.0.6_all.ipk
 opkg install --force-reinstall /tmp/luci-i18n-mentohust-zh-cn_*.ipk
 ```
 
 如果你的固件缺少 `mentohust` 二进制本体，还需要安装对应架构的 `mentohust_*.ipk`。
+
+## 客户端校验数据
+
+部分校园网会要求锐捷客户端校验。遇到以下提示时，需要提供校验数据：
+
+```text
+缺少8021x.exe信息，客户端校验无法继续
+```
+
+可以从学校提供的 Windows Supplicant 安装包中解出 `8021x.exe`，上传到路由器：
+
+```sh
+mkdir -p /etc/mentohust
+scp 8021x.exe root@<router>:/etc/mentohust/8021x.exe
+```
+
+然后在 LuCI 页面里将“客户端数据文件或目录”设置为：
+
+```text
+/etc/mentohust/
+```
+
+`mentohust` 会在这个目录里自动查找 `8021x.exe`。如果使用 MentoHUST 抓包生成的 `.mpf` 数据文件，也可以直接填写该 `.mpf` 文件路径。
 
 安装完成后，可以检查 AppCenter 是否已经识别：
 

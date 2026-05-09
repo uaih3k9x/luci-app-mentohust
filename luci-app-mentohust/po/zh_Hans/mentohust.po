@@ -91,11 +91,17 @@ msgstr "认证前"
 msgid "DHCP Script"
 msgstr "DHCP 脚本"
 
-msgid "Default udhcpc -i"
-msgstr "默认 udhcpc -i"
+msgid "Use udhcpc -i to automatically append the selected network interface."
+msgstr "使用 udhcpc -i 时会自动追加所选网络接口"
 
 msgid "Client Version Number"
 msgstr "客户端版本号"
 
-msgid "Default 0.00，indicating compatibility with xrgsu"
-msgstr "默认 0.00，表示兼容 xrgsu"
+msgid "Only the major.minor part is used by MentoHUST, for example 6.85."
+msgstr "MentoHUST 只使用主版本.次版本，例如 6.85"
+
+msgid "Client Data File or Directory"
+msgstr "客户端数据文件或目录"
+
+msgid "Set a directory such as /etc/mentohust/ when it contains 8021x.exe, or set a MentoHUST .mpf data file."
+msgstr "目录中包含 8021x.exe 时填写 /etc/mentohust/ 这类目录，也可以填写 MentoHUST .mpf 数据文件"

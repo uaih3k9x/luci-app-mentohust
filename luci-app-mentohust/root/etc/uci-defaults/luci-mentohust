@@ -9,13 +9,22 @@ uci -q batch <<-EOF >/dev/null
 EOF
 }
 
-[ -f "/etc/config/mentohust" ] || {
-	uci -q batch <<-EOF >/dev/null
-		add mentohust mentohust
-		set mentohust.@mentohust[-1].enable='0'
-		set mentohust.@mentohust[-1].interface=''
-		commit mentohust
-	EOF
+if ! uci -q get mentohust.config >/dev/null; then
+	if uci -q get mentohust.@mentohust[0] >/dev/null; then
+		uci -q rename mentohust.@mentohust[0]=config
+	else
+		uci -q set mentohust.config="mentohust"
+	fi
+	uci -q commit mentohust
+fi
+
+uci -q get mentohust.config.enable >/dev/null || uci -q set mentohust.config.enable="0"
+uci -q get mentohust.config.interface >/dev/null || uci -q set mentohust.config.interface=""
+uci -q commit mentohust
+
+[ -f "/etc/mentohust/8021x.exe" ] && [ -z "$(uci -q get mentohust.config.data_file)" ] && {
+	uci -q set mentohust.config.data_file="/etc/mentohust/"
+	uci -q commit mentohust
 }
 
 [ -f "/etc/config/appcenter" ] && {
@@ -32,7 +41,7 @@ EOF
 			if [ "$name" = "luci-app-mentohust" ] || [ "$pkg_name" = "luci-app-mentohust" ]; then
 				[ "$type" = "package" ] && found_package=1
 				[ "$type" = "package_list" ] && found_list=1
-				uci -q set "appcenter.@${type}[$idx].version=1.0.4"
+				uci -q set "appcenter.@${type}[$idx].version=1.0.6"
 				uci -q set "appcenter.@${type}[$idx].has_luci=1"
 				uci -q set "appcenter.@${type}[$idx].open=1"
 				uci -q set "appcenter.@${type}[$idx].luci_module_route=$route"
@@ -45,7 +54,7 @@ EOF
 	[ "$found_package" = "1" ] || {
 		uci -q add appcenter package
 		uci -q set appcenter.@package[-1].name="luci-app-mentohust"
-		uci -q set appcenter.@package[-1].version="1.0.4"
+		uci -q set appcenter.@package[-1].version="1.0.6"
 		uci -q set appcenter.@package[-1].size="3482"
 		uci -q set appcenter.@package[-1].status="1"
 		uci -q set appcenter.@package[-1].has_luci="1"
@@ -60,7 +69,7 @@ EOF
 		uci -q set appcenter.@package_list[-1].pkg_name="luci-app-mentohust"
 		uci -q set appcenter.@package_list[-1].parent="luci-app-mentohust"
 		uci -q set appcenter.@package_list[-1].size="3482"
-		uci -q set appcenter.@package_list[-1].version="1.0.4"
+		uci -q set appcenter.@package_list[-1].version="1.0.6"
 		uci -q set appcenter.@package_list[-1].has_luci="1"
 		uci -q set appcenter.@package_list[-1].type="1"
 		uci -q set appcenter.@package_list[-1].luci_module_route="$route"

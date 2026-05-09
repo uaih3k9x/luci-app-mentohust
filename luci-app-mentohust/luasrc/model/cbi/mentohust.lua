@@ -101,13 +101,18 @@ o:value("2", translate("After authentication"))
 o:value("3", translate("Before authentication"))
 
 o = s:option(Value, "dhcp_script", translate("DHCP Script"))
-o.description = translate("Default udhcpc -i")
+o.description = translate("Use udhcpc -i to automatically append the selected network interface.")
 o.default = "udhcpc -i"
 o.rmempty = true
 
 o = s:option(Value, "version", translate("Client Version Number"))
-o.description = translate("Default 0.00, indicating compatibility with xrgsu")
+o.description = translate("Only the major.minor part is used by MentoHUST, for example 6.85.")
 o.default = "0.00"
 o.rmempty = false
+
+o = s:option(Value, "data_file", translate("Client Data File or Directory"))
+o.description = translate("Set a directory such as /etc/mentohust/ when it contains 8021x.exe, or set a MentoHUST .mpf data file.")
+o.placeholder = "/etc/mentohust/"
+o.rmempty = true
 
 return m

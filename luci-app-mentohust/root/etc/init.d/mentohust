@@ -23,6 +23,15 @@ get_config() {
 	config_get dhcp_mode config dhcp_mode 1
 	config_get dhcp_script config dhcp_script "udhcpc -i"
 	config_get version config version 0.00
+	config_get data_file config data_file
+
+	if [ "$dhcp_mode" != "0" ] && [ -n "$interface" ]; then
+		case "$dhcp_script" in
+			"udhcpc -i"|*" -i")
+				dhcp_script="$dhcp_script $interface"
+			;;
+		esac
+	fi
 }
 
 append_opt() {
@@ -59,6 +68,7 @@ start_service() {
 	append_opt d "$dhcp_mode"
 	append_opt b 0
 	append_opt v "$version"
+	append_opt f "$data_file"
 	append_opt c "$dhcp_script"
 	procd_set_param stdout 1
 	procd_set_param stderr 1
