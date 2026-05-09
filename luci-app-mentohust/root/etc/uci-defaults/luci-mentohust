@@ -9,5 +9,69 @@ uci -q batch <<-EOF >/dev/null
 EOF
 }
 
-rm -rf /tmp/luci-indexcache*
+[ -f "/etc/config/mentohust" ] || {
+	uci -q batch <<-EOF >/dev/null
+		add mentohust mentohust
+		set mentohust.@mentohust[-1].enable='0'
+		set mentohust.@mentohust[-1].interface=''
+		commit mentohust
+	EOF
+}
+
+[ -f "/etc/config/appcenter" ] && {
+	route="admin/services/mentohust"
+	file="/usr/lib/lua/luci/controller/mentohust.lua"
+	found_package=0
+	found_list=0
+
+	for type in package package_list; do
+		idx=0
+		while uci -q get "appcenter.@${type}[$idx]" >/dev/null; do
+			name="$(uci -q get "appcenter.@${type}[$idx].name")"
+			pkg_name="$(uci -q get "appcenter.@${type}[$idx].pkg_name")"
+			if [ "$name" = "luci-app-mentohust" ] || [ "$pkg_name" = "luci-app-mentohust" ]; then
+				[ "$type" = "package" ] && found_package=1
+				[ "$type" = "package_list" ] && found_list=1
+				uci -q set "appcenter.@${type}[$idx].has_luci=1"
+				uci -q set "appcenter.@${type}[$idx].open=1"
+				uci -q set "appcenter.@${type}[$idx].luci_module_route=$route"
+				[ "$type" = "package_list" ] && uci -q set "appcenter.@${type}[$idx].luci_module_file=$file"
+			fi
+			idx=$((idx + 1))
+		done
+	done
+
+	[ "$found_package" = "1" ] || {
+		uci -q add appcenter package
+		uci -q set appcenter.@package[-1].name="luci-app-mentohust"
+		uci -q set appcenter.@package[-1].version="1.0.3"
+		uci -q set appcenter.@package[-1].size="3482"
+		uci -q set appcenter.@package[-1].status="1"
+		uci -q set appcenter.@package[-1].has_luci="1"
+		uci -q set appcenter.@package[-1].open="1"
+		uci -q set appcenter.@package[-1].icon=""
+		uci -q set appcenter.@package[-1].luci_module_route="$route"
+	}
+
+	[ "$found_list" = "1" ] || {
+		uci -q add appcenter package_list
+		uci -q set appcenter.@package_list[-1].name="luci-app-mentohust"
+		uci -q set appcenter.@package_list[-1].pkg_name="luci-app-mentohust"
+		uci -q set appcenter.@package_list[-1].parent="luci-app-mentohust"
+		uci -q set appcenter.@package_list[-1].size="3482"
+		uci -q set appcenter.@package_list[-1].version="1.0.3"
+		uci -q set appcenter.@package_list[-1].has_luci="1"
+		uci -q set appcenter.@package_list[-1].type="1"
+		uci -q set appcenter.@package_list[-1].luci_module_route="$route"
+		uci -q set appcenter.@package_list[-1].luci_module_file="$file"
+	}
+
+	uci -q commit appcenter
+}
+
+rm -rf /tmp/luci-indexcache* /tmp/luci-modulecache/*
+rm -f /tmp/luci-indexpath /tmp/luci-indexpath_back
+
+[ -x /etc/init.d/rpcd ] && /etc/init.d/rpcd restart >/dev/null 2>&1
+[ -x /etc/init.d/appcenter ] && /etc/init.d/appcenter restart >/dev/null 2>&1
 exit 0

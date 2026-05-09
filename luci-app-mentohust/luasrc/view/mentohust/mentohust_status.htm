@@ -1,0 +1,20 @@
+<script type="text/javascript">//<![CDATA[
+XHR.poll(1, '<%=url([[admin]], [[services]], [[mentohust]], [[status]])%>', null,
+	function(x, data) {
+		var tb = document.getElementById('mentohust_status');
+		if (data && tb) {
+			if (data.running) {
+				tb.innerHTML = '<em style="color:green"><b>MentoHUST <%:RUNNING%></b></em>';
+			} else {
+				tb.innerHTML = '<em style="color:red"><b>MentoHUST <%:NOT RUNNING%></b></em>';
+			}
+		}
+	}
+);
+//]]>
+</script>
+<fieldset class="cbi-section">
+	<p id="mentohust_status">
+		<em><%:Collecting data...%></em>
+	</p>
+</fieldset>
